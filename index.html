@@ -5,63 +5,79 @@
 <title>PMP Simulator</title>
 
 <style>
-:root{
---c1:#1469A7;
---c2:#97B2D5;
---bg:#FFFDF5;
---hover:#E7FEFF;
-
-/* score colors */
---bt:#c97a7a;
---t:#c9b96f;
---at:#6fbf8f;
---aat:#3a9b6a;
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#fff;
 }
-
-body{margin:0;font-family:Arial;background:var(--bg);}
 
 /* HEADER */
 .header{
-background:var(--c1);
+background:#2c5d8a;
 color:#fff;
-padding:10px 15px;
+padding:10px 20px;
 display:flex;
 justify-content:space-between;
+font-size:14px;
 }
 
+/* TOOLBAR */
 .toolbar{
-background:var(--c2);
-padding:6px 15px;
+background:#7f97b5;
+padding:6px 20px;
 font-size:12px;
 display:flex;
 gap:20px;
+align-items:center;
 }
 
 /* MAIN */
 .main{
-max-width:900px;
-margin:auto;
-padding:20px;
+max-width:1000px;
+margin-left:60px;
+margin-top:20px;
+}
+
+/* QUESTION */
+.qtext{
+font-size:16px;
+margin-bottom:20px;
+line-height:1.5;
 }
 
 /* OPTIONS */
 .opt{
 display:flex;
+align-items:center;
 gap:10px;
-padding:6px 0;
+margin:10px 0;
 cursor:pointer;
 }
-.opt:hover{background:var(--hover);}
+.opt:hover{background:#f5faff;}
 
+/* RADIO */
 .radio{
-width:16px;height:16px;
-border:1.5px solid #333;
+width:18px;
+height:18px;
+border:2px solid #444;
 border-radius:50%;
-margin-top:4px;
 }
-.radio.ck{background:#333;}
+.radio.checked{
+background:#444;
+}
 
-.lbl{font-weight:bold;width:20px;}
+/* LABEL */
+.lbl{
+font-weight:bold;
+width:20px;
+}
+
+/* BUTTON */
+.btn{
+margin-top:10px;
+padding:4px 10px;
+font-size:12px;
+}
 
 /* NAV GRID */
 .grid{
@@ -75,21 +91,31 @@ border:1px solid #ccc;
 padding:6px;
 text-align:center;
 cursor:pointer;
+font-size:12px;
 }
 .flag{background:#FAFF49;}
 .ans{background:#cce5cc;}
 
 /* SCORE */
-.row{display:flex;align-items:center;gap:10px;margin:15px 0;}
+.row{
+display:flex;
+align-items:center;
+gap:10px;
+margin:15px 0;
+}
 .bar{
-flex:1;height:20px;display:flex;
-border-radius:10px;overflow:hidden;position:relative;
+flex:1;
+height:20px;
+display:flex;
+border-radius:10px;
+overflow:hidden;
+position:relative;
 }
 .seg{flex:1;}
-.s1{background:var(--bt);}
-.s2{background:var(--t);}
-.s3{background:var(--at);}
-.s4{background:var(--aat);}
+.s1{background:#c97a7a;}
+.s2{background:#c9b96f;}
+.s3{background:#6fbf8f;}
+.s4{background:#3a9b6a;}
 .pointer{
 position:absolute;
 top:-8px;
@@ -105,7 +131,7 @@ border-bottom:10px solid #000;
 
 <script>
 
-/* ===== DATA (200 questions generated) ===== */
+/* ===== DATA (200 QUESTIONS) ===== */
 const ALL_QUESTIONS = (function(){
 
 const base = [
@@ -186,7 +212,7 @@ let html=`
 
 <div class="toolbar">
 <span>Comment</span>
-<span>Highlight (J)</span>
+<span style="background:#FAFF49;padding:2px 6px">Highlight (J)</span>
 <span>Strikethrough (W)</span>
 <span>Calculator</span>
 <span>⚑ <input type="checkbox" ${flag[cur]?"checked":""} onclick="toggleFlag()"></span>
@@ -194,21 +220,21 @@ let html=`
 </div>
 
 <div class="main">
-<div>${q.q}</div>
+<div class="qtext">${q.q}</div>
 `;
 
 q.options.forEach((o,i)=>{
 html+=`
 <div class="opt" onclick="sel(${i})">
-<div class="radio ${ans[cur]==i?"ck":""}"></div>
+<div class="radio ${ans[cur]==i?'checked':''}"></div>
 <div class="lbl">${String.fromCharCode(65+i)}.</div>
 <div>${o}</div>
 </div>`;
 });
 
 html+=`
-<button onclick="prev()">Prev</button>
-<button onclick="next()">Next</button>
+<button class="btn" onclick="prev()">Prev</button>
+<button class="btn" onclick="next()">Next</button>
 </div>
 `;
 
@@ -272,7 +298,7 @@ function row(name,x){
 let b=band(x);
 return`
 <div class="row">
-<div style="width:100px">${name} (${b.l})</div>
+<div style="width:120px">${name} (${b.l})</div>
 <div class="bar">
 <div class="seg s1"></div>
 <div class="seg s2"></div>
