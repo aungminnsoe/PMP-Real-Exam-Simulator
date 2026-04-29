@@ -7,66 +7,89 @@
 <style>
 :root{
 --c1:#1469A7;
+--c2:#97B2D5;
 --bg:#FFFDF5;
---bar1:#c97a7a;
---bar2:#c9b96f;
---bar3:#6fbf8f;
---bar4:#3a9b6a;
+--hover:#E7FEFF;
+
+/* score colors */
+--bt:#c97a7a;
+--t:#c9b96f;
+--at:#6fbf8f;
+--aat:#3a9b6a;
 }
 
 body{margin:0;font-family:Arial;background:var(--bg);}
 
+/* HEADER */
 .header{
 background:var(--c1);
 color:#fff;
-padding:10px;
+padding:10px 15px;
 display:flex;
 justify-content:space-between;
 }
 
 .toolbar{
-background:#97B2D5;
-padding:6px 10px;
+background:var(--c2);
+padding:6px 15px;
 font-size:12px;
+display:flex;
+gap:20px;
 }
 
-.main{padding:20px;max-width:900px;margin:auto;}
+/* MAIN */
+.main{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
 
-.option{padding:6px;cursor:pointer;}
-.option:hover{background:#E7FEFF;}
-.selected{font-weight:bold;}
+/* OPTIONS */
+.opt{
+display:flex;
+gap:10px;
+padding:6px 0;
+cursor:pointer;
+}
+.opt:hover{background:var(--hover);}
 
-.navgrid{
+.radio{
+width:16px;height:16px;
+border:1.5px solid #333;
+border-radius:50%;
+margin-top:4px;
+}
+.radio.ck{background:#333;}
+
+.lbl{font-weight:bold;width:20px;}
+
+/* NAV GRID */
+.grid{
 display:grid;
 grid-template-columns:repeat(10,1fr);
 gap:5px;
-padding:10px;
+padding:20px;
 }
-
-.navcell{
-padding:6px;
+.cell{
 border:1px solid #ccc;
+padding:6px;
 text-align:center;
 cursor:pointer;
-font-size:12px;
 }
-
 .flag{background:#FAFF49;}
+.ans{background:#cce5cc;}
 
+/* SCORE */
+.row{display:flex;align-items:center;gap:10px;margin:15px 0;}
 .bar{
-display:flex;
-height:20px;
-border-radius:10px;
-overflow:hidden;
-position:relative;
+flex:1;height:20px;display:flex;
+border-radius:10px;overflow:hidden;position:relative;
 }
-
 .seg{flex:1;}
-.b1{background:var(--bar1);}
-.b2{background:var(--bar2);}
-.b3{background:var(--bar3);}
-.b4{background:var(--bar4);}
-
+.s1{background:var(--bt);}
+.s2{background:var(--t);}
+.s3{background:var(--at);}
+.s4{background:var(--aat);}
 .pointer{
 position:absolute;
 top:-8px;
@@ -75,7 +98,6 @@ border-right:6px solid transparent;
 border-bottom:10px solid #000;
 }
 </style>
-
 </head>
 
 <body>
@@ -83,27 +105,39 @@ border-bottom:10px solid #000;
 
 <script>
 
-/* ===== SAMPLE DATA (REPLACE LATER) ===== */
-const ALL_QUESTIONS = [
-{
-type:"mcq",
-q:"A project is delayed. What should PM do first?",
-options:["Ignore","Escalate","Analyze root cause","Replace team"],
-answer:2,
-domain:"Process"
-},
-{
-type:"mcq",
-q:"Team conflict arises. What should PM do?",
-options:["Ignore","Facilitate discussion","Escalate","Replace team"],
-answer:1,
-domain:"People"
-}
+/* ===== DATA (200 questions generated) ===== */
+const ALL_QUESTIONS = (function(){
+
+const base = [
+{q:"A project is delayed. What should PM do first?",o:["Escalate","Analyze root cause","Replace team","Add resources"],a:1,d:"Process"},
+{q:"Conflict between team members. What should PM do?",o:["Ignore","Facilitate discussion","Escalate","Replace"],a:1,d:"People"},
+{q:"Stakeholder unhappy. What should PM do?",o:["Ignore","Meet and understand","Escalate","Delay"],a:1,d:"People"},
+{q:"New regulation impacts project. What first?",o:["Update plan","Understand impact","Ignore","Escalate"],a:1,d:"Process"},
+{q:"High risk identified. What next?",o:["Ignore","Analyze and mitigate","Escalate","Monitor"],a:1,d:"Process"},
+{q:"Project misaligned with business. What do?",o:["Continue","Stop","Consult sponsor","Ignore"],a:2,d:"Business"},
+{q:"Major change requested. What do?",o:["Accept","Reject","Follow change control","Escalate"],a:2,d:"Business"}
 ];
 
+let res=[];
+while(res.length<200){
+  base.forEach(q=>{
+    if(res.length<200){
+      res.push({
+        type:"mcq",
+        q:q.q,
+        options:q.o,
+        answer:q.a,
+        domain:q.d
+      });
+    }
+  });
+}
+
+return shuffle(res);
+})();
+
 /* ===== STATE ===== */
-let Q=[],cur=0,ans=[],flag=[];
-let time=0,timer;
+let Q=[],cur=0,ans=[],flag=[],time=0,timer;
 
 /* ===== START ===== */
 function startScreen(){
@@ -122,9 +156,7 @@ function start(n){
 Q=shuffle(ALL_QUESTIONS).slice(0,n);
 ans=Array(n).fill(null);
 flag=Array(n).fill(false);
-
-time= n==180 ? 13800 : n*75;
-
+time = n==180?13800:n*75;
 startTimer();
 render();
 }
@@ -136,8 +168,7 @@ time--;
 if(time<=0) endExam();
 },1000);
 }
-
-function t(){
+function ft(){
 let m=Math.floor(time/60);
 let s=time%60;
 return m+":"+String(s).padStart(2,'0');
@@ -145,18 +176,21 @@ return m+":"+String(s).padStart(2,'0');
 
 /* ===== RENDER ===== */
 function render(){
-
 let q=Q[cur];
 
 let html=`
 <div class="header">
-<div>PMP Sample Test</div>
-<div>${cur+1}/${Q.length} | ${t()}</div>
+<div>PMP Sample Test - First Name Last Name</div>
+<div>${cur+1}/${Q.length} | ${ft()}</div>
 </div>
 
 <div class="toolbar">
-Flag: <input type="checkbox" ${flag[cur]?"checked":""} onclick="toggleFlag()">
-<button onclick="navigator()">Navigator</button>
+<span>Comment</span>
+<span>Highlight (J)</span>
+<span>Strikethrough (W)</span>
+<span>Calculator</span>
+<span>⚑ <input type="checkbox" ${flag[cur]?"checked":""} onclick="toggleFlag()"></span>
+<button onclick="nav()">Navigator</button>
 </div>
 
 <div class="main">
@@ -164,7 +198,12 @@ Flag: <input type="checkbox" ${flag[cur]?"checked":""} onclick="toggleFlag()">
 `;
 
 q.options.forEach((o,i)=>{
-html+=`<div class="option ${ans[cur]==i?"selected":""}" onclick="select(${i})">${String.fromCharCode(65+i)}. ${o}</div>`;
+html+=`
+<div class="opt" onclick="sel(${i})">
+<div class="radio ${ans[cur]==i?"ck":""}"></div>
+<div class="lbl">${String.fromCharCode(65+i)}.</div>
+<div>${o}</div>
+</div>`;
 });
 
 html+=`
@@ -177,45 +216,37 @@ app.innerHTML=html;
 }
 
 /* ===== ACTIONS ===== */
-function select(i){ans[cur]=i;render();}
+function sel(i){ans[cur]=i;render();}
 function toggleFlag(){flag[cur]=!flag[cur];}
 
 function next(){
 if(cur<Q.length-1){
 cur++;
-checkBreak();
+if(Q.length==180 && (cur==60||cur==120)) alert("Break Time");
 render();
 }else review();
 }
 
 function prev(){if(cur>0){cur--;render();}}
 
-/* ===== BREAK ===== */
-function checkBreak(){
-if(Q.length==180 && (cur==60||cur==120)){
-alert("Break Time");
-}
-}
-
-/* ===== NAVIGATOR ===== */
-function navigator(){
-let html='<div class="navgrid">';
+/* ===== NAV ===== */
+function nav(){
+let html='<div class="grid">';
 for(let i=0;i<Q.length;i++){
-html+=`<div class="navcell ${flag[i]?"flag":""}" onclick="go(${i})">${i+1}</div>`;
+html+=`<div class="cell ${flag[i]?"flag":""} ${ans[i]!=null?"ans":""}" onclick="go(${i})">${i+1}</div>`;
 }
 html+='</div>';
 app.innerHTML=html;
 }
-
 function go(i){cur=i;render();}
 
 /* ===== REVIEW ===== */
 function review(){
 let html="<h2>Review</h2>";
 for(let i=0;i<Q.length;i++){
-html+=`Q${i+1} - ${ans[i]==null?"❌":"✅"} ${flag[i]?"⚑":""}<br>`;
+html+=`Q${i+1} ${ans[i]==null?"❌":"✅"} ${flag[i]?"⚑":""}<br>`;
 }
-html+='<button onclick="endExam()">Submit Exam</button>';
+html+='<button onclick="endExam()">Submit</button>';
 app.innerHTML=html;
 }
 
@@ -231,29 +262,29 @@ if(ans[i]==q.answer) d[q.domain].c++;
 
 function band(x){
 let p=x.c/x.t;
-if(p<0.5)return{l:"BT",pos:25};
-if(p<0.65)return{l:"T",pos:50};
-if(p<0.8)return{l:"AT",pos:70};
-return{l:"AT",pos:85};
+if(p<0.5)return{l:"BT",p:25};
+if(p<0.65)return{l:"T",p:50};
+if(p<0.8)return{l:"AT",p:70};
+return{l:"AT",p:85};
 }
 
 function row(name,x){
 let b=band(x);
 return`
-<div>
-${name} (${b.l})
+<div class="row">
+<div style="width:100px">${name} (${b.l})</div>
 <div class="bar">
-<div class="seg b1"></div>
-<div class="seg b2"></div>
-<div class="seg b3"></div>
-<div class="seg b4"></div>
-<div class="pointer" style="left:${b.pos}%"></div>
+<div class="seg s1"></div>
+<div class="seg s2"></div>
+<div class="seg s3"></div>
+<div class="seg s4"></div>
+<div class="pointer" style="left:${b.p}%"></div>
 </div>
 </div>`;
 }
 
 app.innerHTML=`
-<h2 style="text-align:center">Score Report</h2>
+<h2 style="text-align:center">Examination Score Report</h2>
 <h1 style="text-align:center">${ans.filter((a,i)=>a==Q[i].answer).length}/${Q.length}</h1>
 ${row("People",d.People)}
 ${row("Process",d.Process)}
@@ -264,7 +295,6 @@ ${row("Business",d.Business)}
 /* ===== UTIL ===== */
 function shuffle(a){return a.sort(()=>Math.random()-0.5);}
 
-/* INIT */
 startScreen();
 
 </script>
