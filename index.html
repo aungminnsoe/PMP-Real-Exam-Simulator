@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- VERSION: ECO_WEIGHTED_RIGHT_TOOLBAR_2026_04_30 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PMP Real Exam Simulator</title>
+<title>PMI PMP Real Exam Style Simulator</title>
 <style>
 :root {
   --blue:#1469A7;
@@ -82,8 +83,6 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
 .score-wrap h1{font-size:30px;margin:0 0 35px;color:#11233b}
 .score-big{font-size:68px;line-height:1;font-weight:800;color:#1d2435;margin-bottom:8px}
 .score-pct{font-size:28px;color:#4b6286;margin-bottom:8px}
-.eco-score{font-size:18px;color:#12304c;font-weight:700;margin:4px 0 8px}
-.eco-weights{font-size:13px;color:#5b6475;margin:-4px 0 18px}
 .score-time{font-size:14px;color:#8d88a8;margin-bottom:24px}
 .score-status{display:inline-block;margin:8px 0 24px;padding:9px 28px;border-radius:6px;font-size:22px;font-weight:800;letter-spacing:.5px}
 .score-status.pass{background:#c9f7df;color:#006b38;border:1px solid #77d69d}
@@ -168,7 +167,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function startScreen(){
   clearInterval(timerId);
   app.innerHTML=`<div class="start-screen"><div class="start-card">
-    <h1>PMP Real Exam Simulator</h1>
+    <h1>PMI PMP Real Exam Style Simulator</h1>
     <p>Strict exam mode. Answers and rationales are shown only after final submission.</p>
     <div class="count-grid">
       ${[15,30,60,90,180].map(n=>`<button class="count-btn ${n===selectedCount?'active':''}" onclick="chooseCount(${n})"><strong>${n}</strong><span>${n===180?'Full Exam / 230 min':Math.round(n*75/60)+' min'}</span></button>`).join('')}
@@ -194,15 +193,20 @@ function updateTopTime(){
 function renderShell(content){
   const q=exam[cur];
   app.innerHTML=`<div class="topbar">
-    <div class="top-title">PMI PMP Sample Test - First Name Last Name</div>
-    <div class="top-right">${cur+1}/${selectedCount} | <span id="topTime">${fmt(timeLeft)}</span></div>
+    <div class="top-title">PMI PMP Real Exam Style Simulator</div>
+    <div class="top-right"><span class="count-icon">☰</span><span>${cur+1} of ${selectedCount}</span></div>
   </div>
   <div class="toolrow">
-    <button onclick="toggleComment()"><span class="tool-icon">▧</span>Comment</button>
-    <button onclick="useHighlight()" class="${activeTool==='highlight'?'tool-active':''}"><span class="highlight-swatch"></span>▾ Highlight (J)</button>
-    <button onclick="toggleStrikeMode()" class="${activeTool==='strike'?'tool-active':''}">✎ Strikethrough (W)</button>
-    <button onclick="toggleCalc()">▣ Calculator</button>
-    <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}">⚐ Flag for Review</button></div>
+    <div class="tool-left">
+      <button onclick="toggleComment()"><span class="tool-icon">▧</span>Comment</button>
+      <button onclick="useHighlight()" class="${activeTool==='highlight'?'tool-active':''}"><span class="highlight-swatch"></span>Highlight (J)</button>
+      <button onclick="toggleStrikeMode()" class="${activeTool==='strike'?'tool-active':''}"><span class="tool-icon">✎</span>Strikethrough (W)</button>
+      <button onclick="toggleCalc()"><span class="tool-icon">⌷</span>Calculator</button>
+    </div>
+    <div class="tool-right">
+      <div class="time-wrap"><span class="tool-icon">◔</span><span id="topTime">${fmt(timeLeft)}</span><span>Time remaining</span></div>
+      <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}"><span class="tool-icon">⚐</span>Flag for Review</button></div>
+    </div>
   </div>
   <div class="exam-area">${content}</div>
   <div class="exam-bottom">
@@ -211,6 +215,7 @@ function renderShell(content){
     <div class="bottom-right">${cur<selectedCount-1?`<button class="nav-link" onclick="nextQ()">Next<span class="next-arrow"></span></button>`:`<button class="nav-link" onclick="showReview()">Review / End Exam<span class="next-arrow"></span></button>`}</div>
   </div>`;
 }
+
 function renderQuestion(){
   const q=exam[cur];
   let content=`<div class="qtext">${esc(q.q)}</div>`;
@@ -298,20 +303,12 @@ function submitExam(){
   const pct=Math.round(correct/total*100);
   const used=Math.round(((endTs||Date.now())-startTs)/1000);
   const bPeople=band(domains.People), bProcess=band(domains.Process), bBusiness=band(domains.Business);
-  function domainPct(d){return d.t ? (d.c/d.t)*100 : 0;}
-  const peoplePct=domainPct(domains.People);
-  const processPct=domainPct(domains.Process);
-  const businessPct=domainPct(domains.Business);
-  const ecoWeighted = Math.round((peoplePct*0.42) + (processPct*0.50) + (businessPct*0.08));
-
-  /* PMI does not publish an exact PMP passing percentage. Simulator pass logic:
-     PASS = ECO weighted score >= 65% and no scored domain is Below Target. */
+  /* PMI does not publish an exact passing percentage. Simulator pass logic:
+     PASS = overall score >= 65% and no scored domain is Below Target. */
   const domainBands=[bPeople,bProcess,bBusiness].filter(b=>b.short!=='N/A');
-  const isPass = ecoWeighted>=65 && domainBands.every(b=>b.short!=='BT');
-
-  const row=(name,weight,d,b)=>`<div class="score-row"><div class="score-label">${name}<br><span style="font-size:12px;font-weight:400;color:#5b6475">${weight}</span></div><div class="score-bar"><div class="score-seg bt"></div><div class="score-seg t"></div><div class="score-seg at"></div><div class="score-seg aat"></div><div class="score-pointer" style="left:${b.pos}%"></div></div><div><span class="score-badge ${b.short}">${b.label}</span></div></div>`;
-
-  app.innerHTML=`<div class="score-wrap"><h1>Examination Score Report</h1><div class="score-big">${correct}/${total}</div><div class="score-pct">${pct}%</div><div class="eco-score">ECO Weighted Score: ${ecoWeighted}%</div><div class="eco-weights">People 42% · Process 50% · Business Environment 8%</div><div class="score-time">Time: ${fmt(used)}</div><div class="score-status ${isPass?'pass':'fail'}">${isPass?'PASS':'FAIL'}</div><div class="score-note">Simulator estimate: PASS requires ECO weighted score ≥65% and no domain rated Below Target.</div>${row('People','42%',domains.People,bPeople)}${row('Process','50%',domains.Process,bProcess)}${row('Business','8%',domains.Business,bBusiness)}<button class="primary" onclick="startScreen()">New Exam</button></div>${buildAnswerReview()}`;
+  const isPass = pct>=65 && domainBands.every(b=>b.short!=='BT');
+  const row=(name,d,b)=>`<div class="score-row"><div class="score-label">${name}</div><div class="score-bar"><div class="score-seg bt"></div><div class="score-seg t"></div><div class="score-seg at"></div><div class="score-seg aat"></div><div class="score-pointer" style="left:${b.pos}%"></div></div><div><span class="score-badge ${b.short}">${b.label}</span></div></div>`;
+  app.innerHTML=`<div class="score-wrap"><h1>Examination Score Report</h1><div class="score-big">${correct}/${total}</div><div class="score-pct">${pct}%</div><div class="score-time">Time: ${fmt(used)}</div><div class="score-status ${isPass?'pass':'fail'}">${isPass?'PASS':'FAIL'}</div><div class="score-note">Simulator estimate: PASS requires ≥65% overall and no domain rated Below Target.</div>${row('People',domains.People,bPeople)}${row('Process',domains.Process,bProcess)}${row('Business',domains.Business,bBusiness)}<button class="primary" onclick="startScreen()">New Exam</button></div>${buildAnswerReview()}`;
 }
 function answerLabel(q,a){
   if(q.type==='mcq') return a===null?'No answer':String.fromCharCode(65+a)+'. '+(q.options[a]||'');
