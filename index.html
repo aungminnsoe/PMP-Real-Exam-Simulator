@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PMI PMP Real Exam Style Simulator</title>
+<title>PMP Real Exam Simulator</title>
 <style>
 :root {
   --blue:#1469A7;
@@ -22,19 +22,15 @@
 html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#fff;color:var(--text);font-size:16px}
 button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
 .hidden{display:none!important}
-.topbar{height:40px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 6px;font-size:23px;line-height:1}
-.top-title{font-weight:400;white-space:nowrap}
-.top-right{font-weight:700;font-size:18px;white-space:nowrap;display:flex;align-items:center;gap:4px}
-.count-icon{font-size:18px;display:inline-block;transform:translateY(-1px)}
-.toolrow{min-height:42px;background:#6995d0;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;line-height:1;padding:4px 8px 4px 2px}
-.tool-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.tool-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}
-.toolrow button,.toolrow .tool-btn{border:0;background:transparent;color:#fff;text-decoration:underline;cursor:pointer;font-size:16px;padding:2px 0}
-.tool-icon{opacity:.95;font-size:16px;margin-right:3px;text-decoration:none}
-.highlight-swatch{display:inline-block;background:var(--yellow);width:30px;height:23px;vertical-align:middle;margin:0 4px 0 1px;border:1px solid rgba(0,0,0,.18)}
-.time-wrap{display:flex;align-items:center;gap:5px;font-size:14px}
-.flag-review{display:flex;align-items:center;gap:4px}
-.flag-review button{font-size:14px}
+.topbar{height:48px;background:var(--blue);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 0;font-size:25px;line-height:1}
+.top-title{font-weight:400;padding-left:4px;white-space:nowrap}
+.top-right{font-weight:700;font-size:21px;white-space:nowrap}
+.toolrow{height:37px;background:#6396d1;color:white;display:flex;align-items:center;gap:16px;font-size:20px;line-height:1;padding:0 0}
+.toolrow button,.toolrow .tool-btn{border:0;background:transparent;color:white;text-decoration:underline;cursor:pointer;font-size:20px;padding:4px 0}
+.tool-icon{opacity:.9;font-size:18px;margin-right:3px;text-decoration:none}
+.highlight-swatch{display:inline-block;background:var(--yellow);width:33px;height:28px;vertical-align:middle;margin:0 3px 0 2px;border:1px solid rgba(0,0,0,.15)}
+.flag-review{margin-left:auto;padding-right:2px;display:flex;align-items:center;gap:3px}
+.flag-review button{font-size:20px}
 .flagged-text{color:#ffe24d!important}
 .exam-area{background:#fff;min-height:calc(100vh - 122px);padding:25px 14px 72px 14px;font-size:21px;line-height:1.28}
 .qtext{max-width:1800px;margin-bottom:23px;white-space:pre-wrap}
@@ -86,7 +82,13 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
 .score-wrap h1{font-size:30px;margin:0 0 35px;color:#11233b}
 .score-big{font-size:68px;line-height:1;font-weight:800;color:#1d2435;margin-bottom:8px}
 .score-pct{font-size:28px;color:#4b6286;margin-bottom:8px}
+.eco-score{font-size:18px;color:#12304c;font-weight:700;margin:4px 0 8px}
+.eco-weights{font-size:13px;color:#5b6475;margin:-4px 0 18px}
 .score-time{font-size:14px;color:#8d88a8;margin-bottom:24px}
+.score-status{display:inline-block;margin:8px 0 24px;padding:9px 28px;border-radius:6px;font-size:22px;font-weight:800;letter-spacing:.5px}
+.score-status.pass{background:#c9f7df;color:#006b38;border:1px solid #77d69d}
+.score-status.fail{background:#ffe1df;color:#a30000;border:1px solid #d98b86}
+.score-note{font-size:12px;color:#6b7280;margin:-12px 0 18px}
 .score-row{display:grid;grid-template-columns:120px 1fr 130px;gap:12px;align-items:center;margin:26px 0;text-align:left}
 .score-label{font-size:16px;color:#0b2b57;font-weight:700}
 .score-bar{height:26px;border-radius:5px;display:flex;position:relative;overflow:visible}
@@ -119,13 +121,10 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
 .match-left{border:1px solid #bbb;background:#f7f7f7;padding:8px}
 .match-row select{font-size:16px;padding:6px}
 @media(max-width:700px){
-  .topbar{font-size:18px;height:auto;min-height:42px}
-  .top-title{font-size:18px;white-space:normal}
-  .top-right{font-size:14px}
-  .toolrow{font-size:13px;gap:8px;overflow-x:auto;align-items:flex-start}
-  .tool-left{gap:10px;flex-wrap:nowrap}
-  .tool-right{font-size:12px}
-  .toolrow button,.toolrow .tool-btn{font-size:13px;white-space:nowrap}
+  .topbar{font-size:18px;height:auto;min-height:44px}
+  .top-right{font-size:16px}
+  .toolrow{font-size:14px;gap:9px;overflow-x:auto}
+  .toolrow button,.toolrow .tool-btn{font-size:14px;white-space:nowrap}
   .exam-area{font-size:17px;padding:18px 10px 70px}
   .opt{grid-template-columns:24px 36px 1fr;margin:18px 0}
   .score-row{grid-template-columns:1fr;gap:6px}
@@ -169,7 +168,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function startScreen(){
   clearInterval(timerId);
   app.innerHTML=`<div class="start-screen"><div class="start-card">
-    <h1>PMI PMP Real Exam Style Simulator</h1>
+    <h1>PMP Real Exam Simulator</h1>
     <p>Strict exam mode. Answers and rationales are shown only after final submission.</p>
     <div class="count-grid">
       ${[15,30,60,90,180].map(n=>`<button class="count-btn ${n===selectedCount?'active':''}" onclick="chooseCount(${n})"><strong>${n}</strong><span>${n===180?'Full Exam / 230 min':Math.round(n*75/60)+' min'}</span></button>`).join('')}
@@ -195,25 +194,20 @@ function updateTopTime(){
 function renderShell(content){
   const q=exam[cur];
   app.innerHTML=`<div class="topbar">
-    <div class="top-title">PMI PMP Real Exam Style Simulator</div>
-    <div class="top-right"><span class="count-icon">☰</span><span>${cur+1} of ${selectedCount}</span></div>
+    <div class="top-title">PMI PMP Sample Test - First Name Last Name</div>
+    <div class="top-right">${cur+1}/${selectedCount} | <span id="topTime">${fmt(timeLeft)}</span></div>
   </div>
   <div class="toolrow">
-    <div class="tool-left">
-      <button onclick="toggleComment()"><span class="tool-icon">▧</span>Comment</button>
-      <button onclick="useHighlight()" class="${activeTool==='highlight'?'tool-active':''}"><span class="highlight-swatch"></span>Highlight (J)</button>
-      <button onclick="toggleStrikeMode()" class="${activeTool==='strike'?'tool-active':''}"><span class="tool-icon">✎</span>Strikethrough (W)</button>
-      <button onclick="toggleCalc()"><span class="tool-icon">⌷</span>Calculator</button>
-    </div>
-    <div class="tool-right">
-      <div class="time-wrap"><span class="tool-icon">◔</span><span id="topTime">${fmt(timeLeft)}</span><span>Time remaining</span></div>
-      <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}"><span class="tool-icon">⚐</span>Flag for Review</button></div>
-    </div>
+    <button onclick="toggleComment()"><span class="tool-icon">▧</span>Comment</button>
+    <button onclick="useHighlight()" class="${activeTool==='highlight'?'tool-active':''}"><span class="highlight-swatch"></span>▾ Highlight (J)</button>
+    <button onclick="toggleStrikeMode()" class="${activeTool==='strike'?'tool-active':''}">✎ Strikethrough (W)</button>
+    <button onclick="toggleCalc()">▣ Calculator</button>
+    <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}">⚐ Flag for Review</button></div>
   </div>
   <div class="exam-area">${content}</div>
   <div class="exam-bottom">
-    <div class="bottom-left"><button class="nav-link" onclick="showNavigator()">Navigator</button></div>
-    <div class="bottom-center">${cur>0?`<button class="nav-link" onclick="prevQ()"><span class="prev-arrow"></span>Previous</button>`:''}</div>
+    <div class="bottom-left">${cur>0?`<button class="nav-link" onclick="prevQ()"><span class="prev-arrow"></span>Previous</button>`:''}</div>
+    <div class="bottom-center"><button class="nav-link" onclick="showNavigator()">Navigator</button></div>
     <div class="bottom-right">${cur<selectedCount-1?`<button class="nav-link" onclick="nextQ()">Next<span class="next-arrow"></span></button>`:`<button class="nav-link" onclick="showReview()">Review / End Exam<span class="next-arrow"></span></button>`}</div>
   </div>`;
 }
@@ -303,8 +297,21 @@ function submitExam(){
   function band(d){if(!d.t)return{label:'N/A',short:'N/A',pos:8}; const p=d.c/d.t; if(p<.5)return{label:'Below Target',short:'BT',pos:27}; if(p<.65)return{label:'Target',short:'T',pos:50}; if(p<.8)return{label:'Above Target',short:'AT',pos:70}; return{label:'Above Target',short:'AT',pos:86};}
   const pct=Math.round(correct/total*100);
   const used=Math.round(((endTs||Date.now())-startTs)/1000);
-  const row=(name,d)=>{const b=band(d);return `<div class="score-row"><div class="score-label">${name}</div><div class="score-bar"><div class="score-seg bt"></div><div class="score-seg t"></div><div class="score-seg at"></div><div class="score-seg aat"></div><div class="score-pointer" style="left:${b.pos}%"></div></div><div><span class="score-badge ${b.short}">${b.label}</span></div></div>`;};
-  app.innerHTML=`<div class="score-wrap"><h1>Examination Score Report</h1><div class="score-big">${correct}/${total}</div><div class="score-pct">${pct}%</div><div class="score-time">Time: ${fmt(used)}</div>${row('People',domains.People)}${row('Process',domains.Process)}${row('Business',domains.Business)}<button class="primary" onclick="startScreen()">New Exam</button></div>${buildAnswerReview()}`;
+  const bPeople=band(domains.People), bProcess=band(domains.Process), bBusiness=band(domains.Business);
+  function domainPct(d){return d.t ? (d.c/d.t)*100 : 0;}
+  const peoplePct=domainPct(domains.People);
+  const processPct=domainPct(domains.Process);
+  const businessPct=domainPct(domains.Business);
+  const ecoWeighted = Math.round((peoplePct*0.42) + (processPct*0.50) + (businessPct*0.08));
+
+  /* PMI does not publish an exact PMP passing percentage. Simulator pass logic:
+     PASS = ECO weighted score >= 65% and no scored domain is Below Target. */
+  const domainBands=[bPeople,bProcess,bBusiness].filter(b=>b.short!=='N/A');
+  const isPass = ecoWeighted>=65 && domainBands.every(b=>b.short!=='BT');
+
+  const row=(name,weight,d,b)=>`<div class="score-row"><div class="score-label">${name}<br><span style="font-size:12px;font-weight:400;color:#5b6475">${weight}</span></div><div class="score-bar"><div class="score-seg bt"></div><div class="score-seg t"></div><div class="score-seg at"></div><div class="score-seg aat"></div><div class="score-pointer" style="left:${b.pos}%"></div></div><div><span class="score-badge ${b.short}">${b.label}</span></div></div>`;
+
+  app.innerHTML=`<div class="score-wrap"><h1>Examination Score Report</h1><div class="score-big">${correct}/${total}</div><div class="score-pct">${pct}%</div><div class="eco-score">ECO Weighted Score: ${ecoWeighted}%</div><div class="eco-weights">People 42% · Process 50% · Business Environment 8%</div><div class="score-time">Time: ${fmt(used)}</div><div class="score-status ${isPass?'pass':'fail'}">${isPass?'PASS':'FAIL'}</div><div class="score-note">Simulator estimate: PASS requires ECO weighted score ≥65% and no domain rated Below Target.</div>${row('People','42%',domains.People,bPeople)}${row('Process','50%',domains.Process,bProcess)}${row('Business','8%',domains.Business,bBusiness)}<button class="primary" onclick="startScreen()">New Exam</button></div>${buildAnswerReview()}`;
 }
 function answerLabel(q,a){
   if(q.type==='mcq') return a===null?'No answer':String.fromCharCode(65+a)+'. '+(q.options[a]||'');
