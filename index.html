@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- VERSION: REAL_EXAM_FLAG_STYLE_NO_YELLOW_BADGE_2026_04_30 -->
 <!-- VERSION: FLAG_VISIBILITY_UPDATE_2026_04_30 -->
 <!-- VERSION: UI_RIGHT_TOOLBAR_NAV_CENTER_ECO_2026_04_30 -->
 <!-- VERSION: ECO_WEIGHTED_RIGHT_TOOLBAR_2026_04_30 -->
@@ -260,55 +261,45 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
 }
 
 
-/* === FLAG VISIBILITY UPDATE === */
+
+/* === REAL EXAM FLAG STYLE UPDATE === */
 .tool-right{
-  top:5px!important;
-  gap:7px!important;
+  top:4px!important;
+  gap:4px!important;
   line-height:1.05!important;
 }
 .time-wrap{
-  margin-bottom:3px!important;
+  margin-bottom:2px!important;
 }
 .flag-review{
-  padding:2px 0 1px 0!important;
+  padding:0!important;
 }
 .flag-review button{
-  border-radius:3px!important;
-  padding:2px 6px!important;
-  transition:background .18s,color .18s,box-shadow .18s!important;
+  color:#fff!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  text-decoration:underline!important;
+  border-radius:0!important;
+  padding:0!important;
+  font-size:14px!important;
 }
 .flag-review button.flagged-text{
-  color:#111!important;
-  background:#FAFF49!important;
-  text-decoration:none!important;
-  box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 8px rgba(250,255,73,.95)!important;
-  animation:flagPulse 1s ease-in-out 2!important;
-}
-@keyframes flagPulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.04)}
+  color:#fff!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  animation:none!important;
+  font-weight:700!important;
 }
 .nav-cell.flagged{
-  background:#FAFF49!important;
-  border:2px solid #111!important;
+  background:#fff5a6!important;
+  border:1px solid #333!important;
   font-weight:700!important;
 }
 .nav-cell.current.flagged{
   outline:3px solid #1469A7!important;
-  box-shadow:0 0 0 3px #FAFF49!important;
+  box-shadow:none!important;
 }
-.flag-status{
-  display:inline-block;
-  margin-left:8px;
-  padding:1px 6px;
-  border-radius:3px;
-  background:#FAFF49;
-  color:#111;
-  font-weight:700;
-  font-size:12px;
-  animation:flagPulse 1s ease-in-out 2;
-}
-
 </style>
 </head>
 <body>
@@ -385,7 +376,7 @@ function renderShell(content){
     </div>
     <div class="tool-right">
       <div class="time-wrap"><span class="tool-icon">◔</span><span id="topTime">${fmt(timeLeft)}</span><span>Time remaining</span></div>
-      <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}" title="${flags[cur]?'This question is flagged':'Flag this question for review'}"><span class="tool-icon">${flags[cur]?'⚑':'⚐'}</span>${flags[cur]?'Flagged for Review':'Flag for Review'}</button></div>
+      <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}" title="${flags[cur]?'This question is flagged':'Flag this question for review'}"><span class="tool-icon">${flags[cur]?'⚑':'⚐'}</span>Flag for Review</button></div>
     </div>
   </div>
   <div class="exam-area">${content}</div>
@@ -398,7 +389,7 @@ function renderShell(content){
 
 function renderQuestion(){
   const q=exam[cur];
-  let content=`<div class="qtext">${esc(q.q)}${flags[cur]?'<span class="flag-status">FLAGGED</span>':''}</div>`;
+  let content=`<div class="qtext">${esc(q.q)}</div>`;
   if(q.type==='mcq'){
     content+=`<div class="options">`+q.options.map((o,i)=>`<div class="opt ${strikes[cur][i]?'struck':''}" onclick="optionClick(${i})">
       <span class="radio ${answers[cur]===i?'checked':''}"></span><span class="opt-letter">${String.fromCharCode(65+i)}.</span><span class="opt-text">${esc(o)}</span>
