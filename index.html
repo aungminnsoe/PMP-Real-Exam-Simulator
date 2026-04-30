@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- VERSION: FLAG_VISIBILITY_UPDATE_2026_04_30 -->
 <!-- VERSION: UI_RIGHT_TOOLBAR_NAV_CENTER_ECO_2026_04_30 -->
 <!-- VERSION: ECO_WEIGHTED_RIGHT_TOOLBAR_2026_04_30 -->
 <meta charset="UTF-8">
@@ -258,6 +259,56 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
   .time-wrap,.flag-review button{font-size:12px!important}
 }
 
+
+/* === FLAG VISIBILITY UPDATE === */
+.tool-right{
+  top:5px!important;
+  gap:7px!important;
+  line-height:1.05!important;
+}
+.time-wrap{
+  margin-bottom:3px!important;
+}
+.flag-review{
+  padding:2px 0 1px 0!important;
+}
+.flag-review button{
+  border-radius:3px!important;
+  padding:2px 6px!important;
+  transition:background .18s,color .18s,box-shadow .18s!important;
+}
+.flag-review button.flagged-text{
+  color:#111!important;
+  background:#FAFF49!important;
+  text-decoration:none!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 8px rgba(250,255,73,.95)!important;
+  animation:flagPulse 1s ease-in-out 2!important;
+}
+@keyframes flagPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
+.nav-cell.flagged{
+  background:#FAFF49!important;
+  border:2px solid #111!important;
+  font-weight:700!important;
+}
+.nav-cell.current.flagged{
+  outline:3px solid #1469A7!important;
+  box-shadow:0 0 0 3px #FAFF49!important;
+}
+.flag-status{
+  display:inline-block;
+  margin-left:8px;
+  padding:1px 6px;
+  border-radius:3px;
+  background:#FAFF49;
+  color:#111;
+  font-weight:700;
+  font-size:12px;
+  animation:flagPulse 1s ease-in-out 2;
+}
+
 </style>
 </head>
 <body>
@@ -334,7 +385,7 @@ function renderShell(content){
     </div>
     <div class="tool-right">
       <div class="time-wrap"><span class="tool-icon">◔</span><span id="topTime">${fmt(timeLeft)}</span><span>Time remaining</span></div>
-      <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}"><span class="tool-icon">⚐</span>Flag for Review</button></div>
+      <div class="flag-review"><button onclick="toggleFlag()" class="${flags[cur]?'flagged-text':''}" title="${flags[cur]?'This question is flagged':'Flag this question for review'}"><span class="tool-icon">${flags[cur]?'⚑':'⚐'}</span>${flags[cur]?'Flagged for Review':'Flag for Review'}</button></div>
     </div>
   </div>
   <div class="exam-area">${content}</div>
@@ -347,7 +398,7 @@ function renderShell(content){
 
 function renderQuestion(){
   const q=exam[cur];
-  let content=`<div class="qtext">${esc(q.q)}</div>`;
+  let content=`<div class="qtext">${esc(q.q)}${flags[cur]?'<span class="flag-status">FLAGGED</span>':''}</div>`;
   if(q.type==='mcq'){
     content+=`<div class="options">`+q.options.map((o,i)=>`<div class="opt ${strikes[cur][i]?'struck':''}" onclick="optionClick(${i})">
       <span class="radio ${answers[cur]===i?'checked':''}"></span><span class="opt-letter">${String.fromCharCode(65+i)}.</span><span class="opt-text">${esc(o)}</span>
@@ -395,7 +446,7 @@ function resumeAfterBreak(){cur++;timerId=setInterval(()=>{timeLeft--;if(timeLef
 function showNavigator(){
   clearInterval(timerId);
   let html=`<div class="navigator-page"><h2 class="nav-title">Question Navigator</h2>
-  <div class="nav-legend"><span><b class="legend-box" style="background:#dbeed5"></b>Answered</span><span><b class="legend-box" style="background:#fff"></b>Unanswered</span><span><b class="legend-box" style="background:#fff5a6"></b>Flagged</span></div>
+  <div class="nav-legend"><span><b class="legend-box" style="background:#dbeed5"></b>Answered</span><span><b class="legend-box" style="background:#fff"></b>Unanswered</span><span><b class="legend-box" style="background:#FAFF49;border:2px solid #111"></b>Flagged for Review</span></div>
   <div class="nav-grid">`+
   exam.map((q,i)=>`<div class="nav-cell ${i===cur?'current':''} ${isAnswered(i)?'answered':'unanswered'} ${flags[i]?'flagged':''}" onclick="goQ(${i})">${i+1}</div>`).join('')+
   `</div><button class="primary" onclick="returnExam()">Return to Exam</button><button class="secondary" onclick="showReview()">Review / End Exam</button></div>`;
