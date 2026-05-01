@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- VERSION: PMI_TRANSPARENT_ESTIMATE_SCORING_2026_05_01 -->
+<!-- VERSION: SCORE_ARROW_ALIGNED_TO_BANDS_2026_05_01 -->
 <!-- VERSION: MULTI_SELECT_FIX_2026_04_30 -->
 <!-- VERSION: REAL_EXAM_FLAG_STYLE_NO_YELLOW_BADGE_2026_04_30 -->
 <!-- VERSION: FLAG_VISIBILITY_UPDATE_2026_04_30 -->
@@ -96,10 +98,10 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
 .score-label{font-size:16px;color:#0b2b57;font-weight:700}
 .score-bar{height:26px;border-radius:5px;display:flex;position:relative;overflow:visible}
 .score-seg{height:100%}
-.score-seg.bt{background:#d58a8a;width:27%}
-.score-seg.t{background:#d0c26c;width:27%}
-.score-seg.at{background:#79c99b;width:28%}
-.score-seg.aat{background:#289966;width:18%;border-radius:0 5px 5px 0}
+.score-seg.bt{background:#d58a8a;width:50%}
+.score-seg.t{background:#d0c26c;width:15%}
+.score-seg.at{background:#79c99b;width:15%}
+.score-seg.aat{background:#289966;width:20%;border-radius:0 5px 5px 0}
 .score-seg:first-child{border-radius:5px 0 0 5px}
 .score-pointer{position:absolute;top:29px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid #26384f;transform:translateX(-8px)}
 .score-badge{display:inline-block;text-align:center;border-radius:5px;padding:6px 10px;font-size:13px;font-weight:700}
@@ -324,6 +326,29 @@ button,input,select,textarea{font-family:Arial,Helvetica,sans-serif}
   margin:-12px 0 12px 0;
 }
 
+
+/* === PMI TRANSPARENT SCORE ESTIMATE UPDATE === */
+.score-status.pass::before{content:"Likely "}
+.score-status.fail::before{content:"Needs "}
+.score-status.pass{background:#c9f7df;color:#006b38;border:1px solid #77d69d}
+.score-status.fail{background:#ffe1df;color:#a30000;border:1px solid #d98b86}
+.score-disclaimer{
+  max-width:760px;
+  margin:10px auto 22px;
+  font-size:12px;
+  line-height:1.45;
+  color:#5b6475;
+  background:#f7f9fc;
+  border:1px solid #d7e0ea;
+  border-radius:6px;
+  padding:9px 12px;
+}
+.score-method{
+  font-size:13px;
+  color:#5b6475;
+  margin:-4px 0 12px;
+}
+
 </style>
 </head>
 <body>
@@ -535,16 +560,26 @@ function submitExam(){
   const total=exam.length, correct=exam.reduce((s,_,i)=>s+(correctFor(i)?1:0),0);
   const domains={People:{c:0,t:0},Process:{c:0,t:0},Business:{c:0,t:0}};
   exam.forEach((q,i)=>{const d=domains[q.domain]||domains.Process; d.t++; if(correctFor(i)) d.c++;});
-  function band(d){if(!d.t)return{label:'N/A',short:'N/A',pos:8}; const p=d.c/d.t; if(p<.5)return{label:'Below Target',short:'BT',pos:27}; if(p<.65)return{label:'Target',short:'T',pos:50}; if(p<.8)return{label:'Above Target',short:'AT',pos:70}; return{label:'Above Target',short:'AT',pos:86};}
+  function band(d){
+    if(!d.t)return{label:'N/A',short:'N/A',pos:8,pct:0};
+    const p=d.c/d.t;
+    const pct=Math.round(p*100);
+    const pos=Math.max(2,Math.min(98,pct));
+    if(p<.5)return{label:'Below Target',short:'BT',pos:pos,pct:pct};
+    if(p<.65)return{label:'Target',short:'T',pos:pos,pct:pct};
+    if(p<.8)return{label:'Above Target',short:'AT',pos:pos,pct:pct};
+    return{label:'Above Target',short:'AT',pos:pos,pct:pct};
+  }
   const pct=Math.round(correct/total*100);
   const used=Math.round(((endTs||Date.now())-startTs)/1000);
   const bPeople=band(domains.People), bProcess=band(domains.Process), bBusiness=band(domains.Business);
-  /* PMI does not publish an exact passing percentage. Simulator pass logic:
-     PASS = overall score >= 65% and no scored domain is Below Target. */
+  /* PMI does not publish an exact passing percentage or exact AT/T/BT thresholds.
+     Simulator estimate logic only:
+     likely pass = ECO weighted score >= 65% and no scored domain is Below Target. */
   const domainBands=[bPeople,bProcess,bBusiness].filter(b=>b.short!=='N/A');
   const isPass = pct>=65 && domainBands.every(b=>b.short!=='BT');
   const row=(name,d,b)=>`<div class="score-row"><div class="score-label">${name}</div><div class="score-bar"><div class="score-seg bt"></div><div class="score-seg t"></div><div class="score-seg at"></div><div class="score-seg aat"></div><div class="score-pointer" style="left:${b.pos}%"></div></div><div><span class="score-badge ${b.short}">${b.label}</span></div></div>`;
-  app.innerHTML=`<div class="score-wrap"><h1>Examination Score Report</h1><div class="score-big">${correct}/${total}</div><div class="score-pct">${pct}%</div><div class="score-time">Time: ${fmt(used)}</div><div class="score-status ${isPass?'pass':'fail'}">${isPass?'PASS':'FAIL'}</div><div class="score-note">Simulator estimate: PASS requires ≥65% overall and no domain rated Below Target.</div>${row('People',domains.People,bPeople)}${row('Process',domains.Process,bProcess)}${row('Business',domains.Business,bBusiness)}<button class="primary" onclick="startScreen()">New Exam</button></div>${buildAnswerReview()}`;
+  app.innerHTML=`<div class="score-wrap"><h1>Examination Score Report</h1><div class="score-big">${correct}/${total}</div><div class="score-pct">${pct}%</div><div class="score-time">Time: ${fmt(used)}</div><div class="score-status ${isPass?'pass':'fail'}">${isPass?'PASS':'REVIEW'}</div><div class="score-method">Official ECO weighting is used: People 42%, Process 50%, Business Environment 8%.</div><div class="score-disclaimer"><b>Simulator estimate only:</b> PMI does not publish a fixed passing percentage or exact AT/T/BT thresholds. This simulator uses ECO-weighted practice scoring and estimated domain bands to indicate a likely result.</div>${row('People',domains.People,bPeople)}${row('Process',domains.Process,bProcess)}${row('Business',domains.Business,bBusiness)}<button class="primary" onclick="startScreen()">New Exam</button></div>${buildAnswerReview()}`;
 }
 function answerLabel(q,a){
   if(q.type==='mcq') return Array.isArray(a)?(a.length?a.slice().sort((x,y)=>x-y).map(x=>String.fromCharCode(65+x)+'. '+(q.options[x]||'')).join('; '):'No answer'):(a===null?'No answer':String.fromCharCode(65+a)+'. '+(q.options[a]||''));
